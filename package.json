@@ -1,0 +1,20 @@
+{
+  "name": "blog-back-end",
+  "version": "1.0.0",
+  "description": "",
+  "main": "Auth.js",
+  "scripts": {
+    "dev": "nodemon Auth.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.3.1",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.6.1"
+  }
+}
