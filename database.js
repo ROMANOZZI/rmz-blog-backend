@@ -60,7 +60,7 @@ const addToken = async (Token, email) => {
  */
 const checkToken = async (Token) => {
   const res = await pool.query(`
-  select * from refresh_tokens where token=${Token}
+  select * from refresh_tokens where token= "${Token}"
   `);
   return res[0].length > 0;
 };

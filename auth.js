@@ -44,6 +44,11 @@ app.post("/login", async (req, res) => {
       { name: data[0][0].name, email: data[0][0].email },
       process.env.REFRESH_KEY
     );
+    try {
+      await database.addToken(refreshToken, data[0][0].email);
+    } catch {
+      res.status(500).send();
+    }
     return res.json({
       accessToken: accessToken,
       refreshToken: refreshToken,
@@ -51,6 +56,23 @@ app.post("/login", async (req, res) => {
   }
 
   return res.status(500).send("something went wrong");
+});
+app.post("/refreshToken", async (req, res) => {
+  if (!req.body.refreshToken || !req.body.email) res.sendStatus(403);
+  if (!(await database.checkToken(req.body.refreshToken))) res.sendStatus(403);
+  try {
+    jwt.verify(req.body.refreshToken, process.env.REFRESH_KEY, (err, user) => {
+      if (err) {
+        return res.sendStatus(403);
+      }
+      const accessToken = jwt.sign(user, process.env.PRIVATE_KEY, {
+        expiresIn: "10m",
+      });
+      res.json({ accessToken: accessToken });
+    });
+  } catch (err) {
+    res.sendStatus(500);
+  }
 });
 app.listen(4000, () => {
   console.log("the server is listening on port 4000 sir");
