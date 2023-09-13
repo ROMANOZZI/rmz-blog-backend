@@ -5,8 +5,10 @@ const bcrypt = require("bcrypt");
 const database = require("./database");
 const app = express();
 const jwt = require("jsonwebtoken");
+const posts = require("./posts");
 app.use(cors());
 app.use(express.json());
+
 // registering new users
 /* The code block `app.post("/signup", async (req, res) => { ... })` is defining a route handler for
 the HTTP POST request to "/signup". */
@@ -58,22 +60,37 @@ app.post("/login", async (req, res) => {
   return res.status(500).send("something went wrong");
 });
 app.post("/refreshToken", async (req, res) => {
-  if (!req.body.refreshToken || !req.body.email) res.sendStatus(403);
-  if (!(await database.checkToken(req.body.refreshToken))) res.sendStatus(403);
+  if (!req.body.refreshToken) return res.sendStatus(403);
+  if (!(await database.checkToken(req.body.refreshToken)))
+    return res.sendStatus(403);
   try {
     jwt.verify(req.body.refreshToken, process.env.REFRESH_KEY, (err, user) => {
       if (err) {
         return res.sendStatus(403);
       }
-      const accessToken = jwt.sign(user, process.env.PRIVATE_KEY, {
-        expiresIn: "10m",
+      const newAccessToken = jwt.sign(
+        { name: user.name, email: user.email },
+        process.env.PRIVATE_KEY,
+        {
+          expiresIn: "10m",
+        }
+      );
+      return res.json({
+        accessToken: newAccessToken,
+        user: {
+          name: user.name,
+          email: user.email,
+        },
       });
-      res.json({ accessToken: accessToken });
     });
   } catch (err) {
-    res.sendStatus(500);
+    console.log(err);
+    return res.sendStatus(500);
   }
 });
+
+app.use("/posts", posts);
+
 app.listen(4000, () => {
   console.log("the server is listening on port 4000 sir");
 });
