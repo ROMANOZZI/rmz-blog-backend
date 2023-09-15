@@ -15,7 +15,7 @@ create table comments(
 comment_id varchar(255) primary key ,
 email varchar(255),
 type varchar(255),
-createdAt time,
+createdAt datetime,
 content text ,
 post_id varchar(255) ,
 foreign key(email) references users(email),
@@ -23,7 +23,7 @@ foreign key(post_id) references posts(post_id)
 )
 create table posts(
 post_id varchar(255) primary key ,
-createdAt time,
+createdAt datetime,
 title varchar(255),
 content text,
 vote int)
