@@ -75,12 +75,29 @@ const checkToken = async (Token) => {
  * @returns The function `getMyposts` is returning the result of the SQL query executed using the
  * `pool.query` method. The result is an array of posts that match the specified email address.
  */
-const getMyposts = async (email) => {
-  const res = await pool.query(`
-  select posts.post_id,title,content,createdAt,users.email from posts inner join write_post on posts.post_id=write_post.post_id inner Join users on write_post.email =users.email where users.email="${email}"
+const getMyposts = async (email, limit = 25, offset = 0) => {
+  try {
+    const res = await pool.query(`
+  select posts.post_id,title,content,createdAt,users.email from posts inner join write_post on posts.post_id=write_post.post_id inner Join users on write_post.email =users.email where users.email="${email}" Limit ${limit} offset ${offset}
 `);
-  return res[0];
+    const res2 = await pool.query(`
+select count(post_id) from write_post where email="${email}"
+`);
+    return { data: res[0], count: res2[0][0]["count(post_id)"] };
+  } catch (err) {
+    console.log(err);
+  }
 };
+const getPosts = async (email, limit = 25, offset = 0) => {
+  const res = await pool.query(
+    `select posts.post_id,title,content,createdAt ,vote from posts inner join write_post on posts.post_id = write_post.post_id inner join users on users.email=write_post.email where users.email <> "${email}" order by vote desc,createdAt desc limit ${limit} offset ${offset} ;`
+  );
+  const res2 = await pool.query(`
+  select count(post_id) from write_post where email !="${email}"
+  `);
+  return { data: res[0], count: res2[0][0]["count(post_id)"] };
+};
+
 /**
  * The `addPost` function is an asynchronous function that inserts a new post into the database with
  * the provided title, content, email, and an optional vote count.
@@ -169,4 +186,7 @@ const downVote = async (post_id, email) => {
     console.log(err);
   }
 };
+
+getPosts("Abdallahsaeid@gmail.com").then((res) => console.log(res));
+
 module.exports = { checkUserByEmail, addUser, addToken, addToken, checkToken };
