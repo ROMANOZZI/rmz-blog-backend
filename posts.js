@@ -1,11 +1,11 @@
 const { Router } = require("express");
 const jwt = require("jsonwebtoken");
-const posts = require("./examples");
+const database = require("./database");
 const e = require("express");
 require("dotenv").config();
 
 const router = Router();
-router.get("/main", (req, res) => {
+router.get("/main", async (req, res) => {
   const token = req.headers["authorization"].split(" ")[1];
   if (!token) return res.sendStatus(401);
 
@@ -15,14 +15,16 @@ router.get("/main", (req, res) => {
     }
     email = user.email;
     if (!user.email) return res.sendStatus(403);
-    res.status(200).send(randomPosts(posts, email));
+
+    database
+      .getPosts(email)
+      .then((data) => {
+        res.json(data);
+      })
+      .catch((err) => {
+        res.sendStatus(500);
+      });
   });
 });
 
-function randomPosts(posts, email) {
-  const res = posts
-    .filter((post) => post.ownerEmail != email)
-    .sort(() => Math.random() - 0.5);
-  return res;
-}
 module.exports = router;

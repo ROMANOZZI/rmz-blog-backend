@@ -1,6 +1,5 @@
 const mysql = require("mysql2");
 const ulid = require("ulid");
-const { post } = require("./posts");
 
 const pool = mysql
   .createPool({
@@ -238,4 +237,17 @@ const downVote = async (post_id, email) => {
   }
 };
 
-module.exports = { checkUserByEmail, addUser, addToken, addToken, checkToken };
+module.exports = {
+  checkUserByEmail,
+  addUser,
+  addToken,
+  addToken,
+  checkToken,
+  getMyposts,
+  getPosts,
+  addPost,
+  addComment,
+  getComments,
+  upVote,
+  downVote,
+};
