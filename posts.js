@@ -21,7 +21,7 @@ router.get("/main", (req, res) => {
 
 function randomPosts(posts, email) {
   const res = posts
-    .filter((post) => post.ownerEmail == email)
+    .filter((post) => post.ownerEmail != email)
     .sort(() => Math.random() - 0.5);
   return res;
 }

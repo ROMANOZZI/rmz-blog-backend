@@ -2,7 +2,7 @@ const posts = [
   {
     id: "1Sds15fs2sd1sFf1sf",
     title: "my childhood trauma",
-    ownerEmail: "mmmm@gmail.com",
+    ownerEmail: "mpsalah1@gmail.com",
     createdAt: new Date("2022-2-21").toDateString(),
     content: "hello i had a chilhood trauma",
   },
@@ -33,7 +33,7 @@ const posts = [
   {
     id: "4Hf9sDf6Tg2Sd1gGf",
     title: "Travel Adventures",
-    ownerEmail: "mohamedsalah2162000@gmail.com",
+    ownerEmail: "mpsalah1@gmail.com",
     createdAt: new Date("2022-08-05").toDateString(),
     content:
       "Greetings, fellow travelers! I recently had an amazing adventure in Southeast Asia, and I'd like to share my experiences and recommendations.",
