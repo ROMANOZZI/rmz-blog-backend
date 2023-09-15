@@ -238,6 +238,4 @@ const downVote = async (post_id, email) => {
   }
 };
 
-getPosts("Abdallahsaeid@gmail.com").then((res) => console.log(res));
-
 module.exports = { checkUserByEmail, addUser, addToken, addToken, checkToken };
