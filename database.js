@@ -69,12 +69,20 @@ const checkToken = async (Token) => {
 };
 
 /**
- * The function `getMyposts` retrieves posts written by a user with a specific email address.
- * @param email - The email parameter is used to filter the posts based on the email of the user who
- * wrote them.
- * @returns The function `getMyposts` is returning the result of the SQL query executed using the
- * `pool.query` method. The result is an array of posts that match the specified email address.
+ * The function `getMyposts` retrieves a user's posts along with the total count of their posts.
+ * @param email - The email parameter is the email address of the user for whom you want to retrieve
+ * posts.
+ * @param [limit=25] - The `limit` parameter is used to specify the maximum number of posts to retrieve
+ * from the database. By default, it is set to 25 if no value is provided.
+ * @param [offset=0] - The offset parameter is used to specify the starting point of the data to be
+ * retrieved. It determines how many rows should be skipped before starting to return data. For
+ * example, if offset is set to 10, the query will start returning data from the 11th row onwards.
+ * @returns The function `getMyposts` is returning an object with two properties: `data` and `count`.
+ * The `data` property contains the result of the first query, which is an array of posts with their
+ * respective details. The `count` property contains the result of the second query, which is the total
+ * count of posts for the given email.
  */
+
 const getMyposts = async (email, limit = 25, offset = 0) => {
   try {
     const res = await pool.query(`
@@ -88,9 +96,52 @@ select count(post_id) from write_post where email="${email}"
     console.log(err);
   }
 };
+/**
+ * The `getPosts` function retrieves posts from a database, excluding those written by a specific
+ * email, and returns the data along with the total count of posts.
+ * @param email - The email parameter is the email address of a user. It is used to filter out posts
+ * written by the user with the specified email address from the result set.
+ * @param [limit=25] - The `limit` parameter specifies the maximum number of posts to retrieve from the
+ * database. By default, it is set to 25 if no value is provided.
+ * @param [offset=0] - The offset parameter is used to specify the starting position of the records to
+ * be retrieved from the database. It determines how many records should be skipped before starting to
+ * retrieve the data.
+ * @returns The function `getPosts` is returning an object with two properties: `data` and `count`. The
+ * `data` property contains the result of the SQL query executed using `pool.query`, which includes the
+ * `post_id`, `title`, `content`, `createdAt`, and `vote` fields from the `posts` table. The `count`
+ * property contains the result of another SQL query that
+ */
 const getPosts = async (email, limit = 25, offset = 0) => {
   const res = await pool.query(
-    `select posts.post_id,title,content,createdAt ,vote from posts inner join write_post on posts.post_id = write_post.post_id inner join users on users.email=write_post.email where users.email <> "${email}" order by vote desc,createdAt desc limit ${limit} offset ${offset} ;`
+    `
+    SELECT
+    posts.post_id,
+    title,
+    content,
+    createdAt,
+    vote
+FROM
+    posts
+INNER JOIN
+    write_post
+ON
+    posts.post_id = write_post.post_id
+INNER JOIN
+    users
+ON
+    users.email = write_post.email
+LEFT JOIN
+    dwon_vote
+ON
+    posts.post_id = dwon_vote.post_id
+WHERE
+    users.email <> "${email}"
+    AND (dwon_vote.email IS NULL OR dwon_vote.email <> "${email}")
+ORDER BY
+    vote DESC,
+    createdAt DESC
+LIMIT ${limit} OFFSET ${offset};
+`
   );
   const res2 = await pool.query(`
   select count(post_id) from write_post where email !="${email}"
