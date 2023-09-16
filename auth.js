@@ -9,7 +9,6 @@ const posts = require("./posts");
 app.use(cors());
 app.use(express.json());
 
-// registering new users
 /* The code block `app.post("/signup", async (req, res) => { ... })` is defining a route handler for
 the HTTP POST request to "/signup". */
 app.post("/signup", async (req, res) => {
